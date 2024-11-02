@@ -29,3 +29,15 @@ class UserResponse(UserBase):
 class UserLogin(BaseModel):
     username: str
     passwrd: str
+
+class UsertoEdit(BaseModel):
+    user_id: int
+    username: str
+    nombres: str
+    apellidoP: str
+    apellidoM: str
+    sexo: str
+
+    class Config:
+        orm_mode = True
+    

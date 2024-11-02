@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from schemas.user import UserCreate, UserResponse, UserLogin
+from schemas.user import UserCreate, UserResponse, UserLogin, UsertoEdit
 from models import User
 from pydantic import BaseModel
 
@@ -21,16 +21,26 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return db_user
+    return {"role": db_user.rol, "user_id": db_user.user_id, "username": db_user.username}
 
 @router.post("/login/")
 def login(user: UserLogin, db: Session = Depends(get_db)):
-    # Buscar el usuario por su nombre
     db_user = db.query(User).filter(User.username == user.username).first()
-    
-    # Verificar si el usuario existe y si la contraseña es correcta
-    if db_user and db_user.passwrd == user.passwrd:  # Comparación con la columna correcta
-        return {"role": db_user.rol, "user_id": db_user.user_id}  # Asegúrate de que estos sean los atributos correctos
-    
-    # Lanzar excepción HTTP 401 si las credenciales son inválidas
+    if db_user and db_user.passwrd == user.passwrd: 
+        return {"role": db_user.rol, "user_id": db_user.user_id, "username": db_user.username}  
+
     raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@router.get("/users/{user_id}/", response_model=UsertoEdit)
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.user_id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return UsertoEdit(
+        user_id=db_user.user_id,
+        username=db_user.username,
+        nombres=db_user.nombres,
+        apellidoP=db_user.apellidoP,
+        apellidoM=db_user.apellidoM,
+        sexo=db_user.sexo
+    )
