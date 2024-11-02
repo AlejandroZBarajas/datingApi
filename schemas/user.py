@@ -41,3 +41,10 @@ class UsertoEdit(BaseModel):
     class Config:
         orm_mode = True
     
+
+class UserUpdate(BaseModel):
+    username: str
+    nombres: str
+    apellidoP: str
+    apellidoM: str
+    sexo: str
