@@ -25,7 +25,7 @@ class Post(Base):
     descripcion = Column(String(45), nullable=False)
     duracion = Column(String(45), nullable=False)
     costo = Column(String(45), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.user_id"))
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
 
     owner = relationship("User", back_populates="posts")
 
